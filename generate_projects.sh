@@ -43,23 +43,40 @@ while :
     done
 
 if [[ "$response" = "no" ]]; then
-    echo -e "\t\t\t\t\tNo Lol\n"
     git clone $(pwd) $current_work_dir/$deploy_name
 else
-    echo -e "\t\t\t\t\tYes Mdr\n"
+    echo -e "On Which branch Would you like to set the hooks ?"
+            while :
+                do
+                    read branch_name
+                    if [[ -n "$branch_name" ]]; then
+                        echo "This branch doesn't exist. Would you like to create it ? (Y/N)"
+                        read answer
+                        if [[ $answer = 'Y' || $answer = 'y' ]]; then
+                            git branch $answer
+                            break
+                        else
+                            echo -n "The branch you're trying to use doesn't exist."
+                            echo "Choose between '$exist_brc' (the existing branches) or create a new branch"
+                        fi
+                    else
+                        break
+                    fi
+                done
+
     cd hooks
-    cat << 'EOF' > post-receive
+    cat << EOF > post-receive
     #!/bin/bash
 
-    path_bare_dir=$(pwd)
-    if [ ! -d '$current_work_dir/$deploy_name' ]; then
-        git clone $path_bare_dir '$current_work_dir/$deploy_name'
+    path_bare_dir=\$(pwd)
+    if [ ! -d $current_work_dir/$deploy_name ]; then
+        git clone \$path_bare_dir $current_work_dir/$deploy_name
     else
         while read oldrev newrev ref
         do
             if [[ $ref =~ .*/master$ ]]; then
                 echo "Master ref received.  Deploying master branch to production..."
-                git --work-tree='$current_work_dir/$deploy_name' --git-dir='$current_work_dir/$repo_name' checkout -f
+                git --work-tree=$current_work_dir/$deploy_name --git-dir=$current_work_dir/$repo_name checkout $branch_name -f
             else
                 echo "Ref $ref successfully received.  Doing nothing: only the master branch may be deployed on this server."
             fi

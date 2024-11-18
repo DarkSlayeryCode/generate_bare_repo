@@ -24,8 +24,6 @@ if [[ -z "$deploy_name" ]]; then
     deploy_name=deployment/$repo_name
 fi
 
-echo -e "\n\n\t\t\t'$current_work_dir/$deploy_name'\n\n"
-
 mkdir $repo_name && cd $repo_name && git init --bare
 
 echo -e "Would you like to set CI/CD?\n(Yes/No)..."
@@ -46,26 +44,12 @@ if [[ "$response" = "no" ]]; then
     git clone $(pwd) $current_work_dir/$deploy_name
 else
     echo -e "On Which branch Would you like to set the hooks ?"
-            while :
-                do
-                    read branch_name
-                    if [[ -n "$branch_name" ]]; then
-                        echo "This branch doesn't exist. Would you like to create it ? (Y/N)"
-                        read answer
-                        if [[ $answer = 'Y' || $answer = 'y' ]]; then
-                            break
-                        else
-                            echo -n "The branch you're trying to use doesn't exist."
-                            echo "Choose between '$exist_brc' (the existing branches) or create a new branch"
-                        fi
-                    else
-                        break
-                    fi
-                done
-
+    read branch_name
 echo -e "Enter a makefile"
 read makefile_exec
-
+if [[ -z $branch_name ]]; then
+    branch_name=master
+fi
     cd hooks
     cat << EOF > post-receive
 #!/bin/bash
@@ -76,7 +60,7 @@ if [ ! -d $current_work_dir/$deploy_name ]; then
 else
     while read oldrev newrev ref
     do
-        if [[ $ref =~ .*/master$ ]]; then
+        if [[ \$ref =~ .*/$branch_name$ ]]; then
             echo "Master ref received.  Deploying master branch to production..."
             if git branch --list "$branch_name" > /dev/null; then
                 git --work-tree=$current_work_dir/$deploy_name --git-dir=$current_work_dir/$repo_name checkout -b $branch_name
@@ -94,4 +78,3 @@ EOF
 chmod 775 'post-receive'
 fi
 echo "paste 'git clone $(whoami)@$(curl -s ifconfig.me):$current_work_dir/$repo_name' in your terminal"
- 

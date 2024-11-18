@@ -45,8 +45,6 @@ if [[ "$response" = "no" ]]; then
 else
     echo -e "On Which branch Would you like to set the hooks ?"
     read branch_name
-echo -e "Enter a makefile"
-read makefile_exec
 if [[ -z $branch_name ]]; then
     branch_name=master
 fi
@@ -72,8 +70,9 @@ else
         fi
     done
 fi
-cd $current_work_dir
-make $makefile_exec
+cd $current_work_dir/$deploy_name
+echo -ne "You must have a Makefile in your deployment repository!"
+make
 EOF
 chmod 775 'post-receive'
 fi

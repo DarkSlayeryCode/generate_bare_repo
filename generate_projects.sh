@@ -53,7 +53,6 @@ else
                         echo "This branch doesn't exist. Would you like to create it ? (Y/N)"
                         read answer
                         if [[ $answer = 'Y' || $answer = 'y' ]]; then
-                            git branch $answer
                             break
                         else
                             echo -n "The branch you're trying to use doesn't exist."
@@ -63,6 +62,9 @@ else
                         break
                     fi
                 done
+
+echo -e "Enter a command that'll be executed during the deployment!"
+read command_exec
 
     cd hooks
     cat << EOF > post-receive
@@ -76,13 +78,20 @@ else
         do
             if [[ $ref =~ .*/master$ ]]; then
                 echo "Master ref received.  Deploying master branch to production..."
-                git --work-tree=$current_work_dir/$deploy_name --git-dir=$current_work_dir/$repo_name checkout $branch_name -f
+                if git branch --list "$branch_name" > /dev/null; then
+                    git --work-tree=$current_work_dir/$deploy_name --git-dir=$current_work_dir/$repo_name checkout -b $branch_name
+                else
+                    git --work-tree=$current_work_dir/$deploy_name --git-dir=$current_work_dir/$repo_name checkout $branch_name -f
+                fi
             else
                 echo "Ref $ref successfully received.  Doing nothing: only the master branch may be deployed on this server."
             fi
         done
         fi
+        cd $current_work_dir/$deploy_name
+        $command_exec
 EOF
 chmod 775 'post-receive'
 fi
-echo "paste 'git clone $(whoami)@$(curl ifconfig.me):$current_work_dir/$repo_name' in your terminal"
+echo "paste 'git clone $(whoami)@$(curl -s ifconfig.me):$current_work_dir/$repo_name' in your terminal"
+ 

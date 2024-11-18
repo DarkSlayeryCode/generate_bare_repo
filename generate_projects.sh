@@ -63,33 +63,33 @@ else
                     fi
                 done
 
-echo -e "Enter a command that'll be executed during the deployment!"
-read command_exec
+echo -e "Enter a makefile"
+read makefile_exec
 
     cd hooks
     cat << EOF > post-receive
-    #!/bin/bash
+#!/bin/bash
 
-    path_bare_dir=\$(pwd)
-    if [ ! -d $current_work_dir/$deploy_name ]; then
-        git clone \$path_bare_dir $current_work_dir/$deploy_name
-    else
-        while read oldrev newrev ref
-        do
-            if [[ $ref =~ .*/master$ ]]; then
-                echo "Master ref received.  Deploying master branch to production..."
-                if git branch --list "$branch_name" > /dev/null; then
-                    git --work-tree=$current_work_dir/$deploy_name --git-dir=$current_work_dir/$repo_name checkout -b $branch_name
-                else
-                    git --work-tree=$current_work_dir/$deploy_name --git-dir=$current_work_dir/$repo_name checkout $branch_name -f
-                fi
+path_bare_dir=\$(pwd)
+if [ ! -d $current_work_dir/$deploy_name ]; then
+    git clone \$path_bare_dir $current_work_dir/$deploy_name
+else
+    while read oldrev newrev ref
+    do
+        if [[ $ref =~ .*/master$ ]]; then
+            echo "Master ref received.  Deploying master branch to production..."
+            if git branch --list "$branch_name" > /dev/null; then
+                git --work-tree=$current_work_dir/$deploy_name --git-dir=$current_work_dir/$repo_name checkout -b $branch_name
             else
-                echo "Ref $ref successfully received.  Doing nothing: only the master branch may be deployed on this server."
+                git --work-tree=$current_work_dir/$deploy_name --git-dir=$current_work_dir/$repo_name checkout $branch_name -f
             fi
-        done
+        else
+            echo "Ref $ref successfully received.  Doing nothing: only the master branch may be deployed on this server."
         fi
-        cd $current_work_dir/$deploy_name
-        $command_exec
+    done
+fi
+cd $current_work_dir
+make $makefile_exec
 EOF
 chmod 775 'post-receive'
 fi

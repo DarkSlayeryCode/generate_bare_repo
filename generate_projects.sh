@@ -60,7 +60,7 @@ else
     do
         if [[ \$ref =~ .*/$branch_name$ ]]; then
             echo "Master ref received.  Deploying master branch to production..."
-            if git branch --list "$branch_name" > /dev/null; then
+            if ! git branch --list "$branch_name" > /dev/null; then
                 git --work-tree=$deploy_name --git-dir=$current_work_dir/$repo_name checkout -b $branch_name
             else
                 git --work-tree=$deploy_name --git-dir=$current_work_dir/$repo_name checkout $branch_name -f

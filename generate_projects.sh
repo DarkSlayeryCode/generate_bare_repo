@@ -73,7 +73,7 @@ fi
 cd $deploy_name
 echo -ne "You must have a Makefile in your deployment repository!"
 make
-if [ $? -ne 0 ]; then
+if [ \$? -ne 0 ]; then
     echo "There are no Makefile"
 fi
 EOF

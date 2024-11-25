@@ -24,6 +24,15 @@ if [[ -z "$deploy_name" ]]; then
     deploy_name=deployment/$repo_name
 fi
 
+echo -n "Is make installed ? "
+if ! which 'make' > /dev/null; then
+    echo "no"
+    echo 'make is not installed, Attempting to install make!'
+    sudo apt install make
+else
+    echo "yes"
+fi
+
 mkdir $repo_name && cd $repo_name && git init --bare
 
 echo -e "Would you like to set CI/CD?\n(Yes/No)..."

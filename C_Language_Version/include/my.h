@@ -6,11 +6,14 @@
 
 #ifndef MY_H_
     #define MY_H_
+    #include <pwd.h>
+    #include <fcntl.h>
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
     #include <unistd.h>
     #include <stdbool.h>
+    #include <sys/stat.h>
 
 typedef struct {
     int i;
@@ -34,8 +37,13 @@ extern download_with_t dspt[];
 
 extern sfm_t sfm; /* Software Package Manager (The command to download things ex: dnf, apt ...etc) */
 extern char **environ;
-extern char requests[2000];
+extern char pwd[2000];
+extern char response[5];
+extern char repo_name[2000];
+extern char branch_name[2000];
+extern char deploy_name[2500];
 
+char *my_whoami(void);
 char **bin_array(void);
 int my_strlen(char *str);
 char *cleanstr(char *src);

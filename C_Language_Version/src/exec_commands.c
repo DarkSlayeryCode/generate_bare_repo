@@ -26,12 +26,13 @@ char *get_command(char **arr, char *command)
     while (arr[i] != NULL) {
         strcpy(str, arr[i]);
         strcat(str, "/");
-        s = strcat(str, command);
+        s = strdup(strcat(str, command));
         if (access(s, F_OK) == 0) {
             free_array(arr);
             return s;
         }
         reset_string(str);
+        free(s);
         i++;
     }
     free_array(arr);
@@ -51,10 +52,12 @@ void execute_commands(char *command, char **arr)
             // printf("Command \"%s\" not installed, attempting to install it!\n", command);
             // Installation command.
         }
+        free(command);
         free_array(arr);
         exit(0);
     }
     if (fork_return == -10) {
+        free(command);
         free_array(arr);
         printf("Terminating...\n");
         exit(-42);

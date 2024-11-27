@@ -6,7 +6,10 @@
 ##
 
 SRC	=	src/main.c	\
+		src/whoami.c	\
 		src/exec_commands.c	\
+		src/manage_user_input.c	\
+		src/fundamental_funcs/cleanstr.c	\
 		src/fundamental_funcs/my_strlen.c	\
 		src/fundamental_funcs/my_str_to_word_array.c
 
@@ -26,6 +29,7 @@ clean:
 	rm -f *~
 
 fclean:	clean
+	rm -f *vgcore*
 	rm -f coding-style-reports.log
 	rm -f $(NAME)
 

@@ -119,8 +119,8 @@ int main(void)
     }
     chdir(repo_name);
     temp = get_command(bin_array(), "git");
-    char **arrrrrr = str_to_array("git init --bare", " ");
-    execute_commands(temp, arrrrrr);
+    execute_commands(temp, str_to_array("git init --bare", " "));
+    sleep(1);
     get_users_request(response, "Would you like to set CI/CD?\n(Yes/No)...\n", true);
     while (1) {
             if (my_strlen(response) == 1 && response[0] == 'y' || response[0] == 'n')
@@ -158,9 +158,8 @@ int main(void)
         fprintf(post_receive, "make\nif [ $? -ne 0 ]; then\n\techo \"There is no Makefile\"\nfi\n\n");
         fclose(post_receive);
         chmod("post-receive", S_IRWXU | S_IRWXO | S_IRWXG);
-        temp = get_command(bin_array(), "curl");
-        printf("paste 'git clone %s", my_whoami());
-        execute_commands(temp, str_to_array("curl -s ifconfig.me", " "));
+        printf("paste 'git clone %s@", my_whoami());
+        get_pbip();
         printf(":%s/%s' in your terminal\n", pwd, repo_name);
     }
 }

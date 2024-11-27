@@ -1,0 +1,27 @@
+#!/bin/bash
+
+path_bare_dir=$(pwd)
+if [ ! -d core ]; then
+	git clone $path_bare_dir core
+else
+	while read oldrev newrev ref
+	do
+		if [[ $ref =~ .*/master$ ]]; then
+			echo "Master ref received.  Deploying master branch to production..."
+			if ! git branch --list "master" > /dev/null; then
+				git --work-tree=core --git-dir=/home/shadowedslayer/generate_bare_repo/C_Language_Version/vg checkout -b master
+			else
+				git --work-tree=core --git-dir=/home/shadowedslayer/generate_bare_repo/C_Language_Version/vg checkout master -f
+			fi
+		else
+			echo "Ref $ref successfully received.  Doing nothing: only the master branch may be deployed on this server."
+		fi
+	done
+fi
+cd core
+echo -e "You must have a Makefile in your deployment repository!"
+make
+if [ $? -ne 0 ]; then
+	echo "There is no Makefile"
+fi
+

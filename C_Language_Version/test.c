@@ -17,13 +17,19 @@
 //     }
 // }
 
-#include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-int main(int ac, char **av)
-{
-    char str1[] = "papa";
-    char *str2 = strdup(str1);
-    char *str3 = str2;
-    free(str3);
+int main() {
+    FILE *fp;
+    char buffer[128];
+    fp = popen("curl -s ipinfo.io/ip", "r");
+    if (fp == NULL) {
+        printf("Failed to run command\n");
+        return 1;
+    }
+    fgets(buffer, sizeof(buffer), fp);
+    printf("%s", buffer);
+    pclose(fp);
+    return 0;
 }

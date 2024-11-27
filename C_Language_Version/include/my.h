@@ -43,6 +43,7 @@ extern char repo_name[2000];
 extern char branch_name[2000];
 extern char deploy_name[2500];
 
+void get_pbip(void);
 char *my_whoami(void);
 char **bin_array(void);
 int my_strlen(char *str);

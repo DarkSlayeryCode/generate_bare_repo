@@ -41,24 +41,18 @@ char *get_command(char **arr, char *command)
 
 void execute_commands(char *command, char **arr)
 {
-    // char **arr = NULL;
     int fork_return = fork();
 
     if (fork_return == 0) {
-        // arr = str_to_array(command, " ");
         if (execve(command, arr, environ) == -1) {
             printf("An error occurred, couldn't proceed with the generation.\n");
             exit(-10);
-            // printf("Command \"%s\" not installed, attempting to install it!\n", command);
-            // Installation command.
         }
-        free(command);
-        free_array(arr);
         exit(0);
     }
+    free(command);
+    free_array(arr);
     if (fork_return == -10) {
-        free(command);
-        free_array(arr);
         printf("Terminating...\n");
         exit(-42);
     }

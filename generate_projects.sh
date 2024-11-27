@@ -75,7 +75,7 @@ else
                 git --work-tree=$deploy_name --git-dir=$current_work_dir/$repo_name checkout $branch_name -f
             fi
         else
-            echo "Ref $ref successfully received.  Doing nothing: only the master branch may be deployed on this server."
+            echo "Ref \$ref successfully received.  Doing nothing: only the master branch may be deployed on this server."
         fi
     done
 fi

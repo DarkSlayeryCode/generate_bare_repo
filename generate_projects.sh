@@ -50,7 +50,7 @@ while :
     done
 
 if [[ "$response" = "no" ]]; then
-    git clone $(pwd) $current_work_dir/$deploy_name
+    git clone $(pwd) $deploy_name
 else
     echo -e "On Which branch Would you like to set the hooks ?"
     read branch_name

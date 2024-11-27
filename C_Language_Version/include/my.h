@@ -56,6 +56,6 @@ char *get_command(char **arr, char *command);
 int count_nb_chars(char *str, char *separator);
 char **str_to_array(char *str, char *separator);
 void execute_commands(char *command, char **arr);
-void get_users_request(char str[], char *display);
+void get_users_request(char str[], char *display, bool low);
 
 #endif /* MY_H_ */

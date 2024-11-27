@@ -24,11 +24,12 @@ void lower_str(char str[])
     return;
 }
 
-void get_users_request(char str[], char *display)
+void get_users_request(char str[], char *display, bool low)
 {
     write(1, display, strlen(display));
     scanf("%s", str);
-    lower_str(str);
+    if (low == true)
+        lower_str(str);
     strcpy(str, cleanstr(str));
     for (int i = 0; str[i] != 0; i++) {
         if (str[i] == '\n') {

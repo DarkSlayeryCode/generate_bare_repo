@@ -95,15 +95,15 @@ int main(void)
         printf("git is not installed. Attempting to install git!!!\n");
         execute_commands(sfm.exec_name, str_to_array(dspt[pos].git, " "));
     }
-    get_users_request(repo_name, "Enter your project's repository name:\n");
+    get_users_request(repo_name, "Enter your project's repository name:\n", false);
     while (1) {
         if (my_strlen(repo_name) == 0) {
             reset_string(repo_name);
-            get_users_request(repo_name, "Project's repository name cannot be empty\n");
+            get_users_request(repo_name, "Project's repository name cannot be empty\n", false);
         } else
             break;
     }
-    get_users_request(deploy_name, "Enter your deployment repository name:\n");
+    get_users_request(deploy_name, "Enter your deployment repository name:\n", false);
     if (my_strlen(deploy_name) == 0) {
         printf("Using the default deployment repository name since it was not provided!\n");
         strcpy(deploy_name, "deployment/");
@@ -121,26 +121,24 @@ int main(void)
     temp = get_command(bin_array(), "git");
     char **arrrrrr = str_to_array("git init --bare", " ");
     execute_commands(temp, arrrrrr);
-    get_users_request(response, "Would you like to set CI/CD?\n(Yes/No)...\n");
+    get_users_request(response, "Would you like to set CI/CD?\n(Yes/No)...\n", true);
     while (1) {
-        if (my_strlen(response) == 1 || my_strlen(response) == 3) {
             if (my_strlen(response) == 1 && response[0] == 'y' || response[0] == 'n')
                 break;
             if (strcmp(response, "yes") == 0 || strcmp(response, "no") == 0)
                 break;
-        }
         reset_string(response);
-        get_users_request(response, "The response can either be \"Yes\" or \"No\"\n");
+        get_users_request(response, "The response can either be \"Yes\" or \"No\"\n", true);
     }
     if (response[0] == 'n') {
+        char re[200];
         strcpy(git_bash_actions, "git clone ");
-        strcat(git_bash_actions, getpwd());
-        strcat(git_bash_actions, pwd);
-        strcat(git_bash_actions, "/");
+        strcat(git_bash_actions, getcwd(re, 200));
+        strcat(git_bash_actions, " ");
         strcat(git_bash_actions, deploy_name);
         execute_commands(temp, str_to_array(git_bash_actions, " "));
     } else {
-        get_users_request(branch_name, "On Which branch Would you like to set the hooks ?\n");
+        get_users_request(branch_name, "On Which branch Would you like to set the hooks ?\n", false);
         if (my_strlen(branch_name) == 0)
             strcpy(branch_name, "master");
         chdir("hooks");

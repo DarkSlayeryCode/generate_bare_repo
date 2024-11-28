@@ -6,6 +6,7 @@
 ##
 
 SRC	=	src/main.c	\
+		src/usage.c	\
 		src/whoami.c	\
 		src/exec_commands.c	\
 		src/get_public_ip.c	\

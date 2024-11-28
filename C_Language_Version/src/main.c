@@ -82,11 +82,20 @@ char *getpwd(void)
     return &environ[i][4];
 }
 
-int main(void)
+int main(int ac, char **av)
 {
     int pos = 0;
     char *temp = NULL;
 
+    if (ac != 1 && ac != 2)
+        exit -42;
+    if (ac == 2) {
+        lower_str(av[1]);
+        if (strcmp(av[1], "-h") == 0 || strcmp(av[1], "-help") == 0
+        || strcmp(av[1], "--help") == 0)
+            usage();
+        exit(-42);
+    }
     get_sfm();
     char git_bash_actions[3000];
     strcpy(pwd, getpwd());

@@ -1,5 +1,4 @@
 /*
-** EPITECH PROJECT, 2024
 ** generate_bare_repo
 ** File description:
 ** usage.c

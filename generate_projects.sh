@@ -62,28 +62,23 @@ fi
 #!/bin/bash
 
 path_bare_dir=\$(pwd)
-if [ ! -d $deploy_name ]; then
-    git clone \$path_bare_dir $deploy_name
-else
-    while read oldrev newrev ref
-    do
-        if [[ \$ref =~ .*/$branch_name$ ]]; then
-            echo "Master ref received.  Deploying master branch to production..."
-            if ! git branch --list "$branch_name" > /dev/null; then
-                git --work-tree=$deploy_name --git-dir=$current_work_dir/$repo_name checkout -b $branch_name
-            else
-                git --work-tree=$deploy_name --git-dir=$current_work_dir/$repo_name checkout $branch_name -f
-            fi
-        else
-            echo "Ref \$ref successfully received.  Doing nothing: only the master branch may be deployed on this server."
-        fi
-    done
-fi
+while read oldrev newrev ref
+do
+    if [[ \$(echo "\$ref" | sed 's|refs/heads/||') != $branch_name ]]; then
+        exit 1
+    fi
+    echo "Master ref received.  Deploying $branch_name branch to production..."
+    if [ ! -d $deploy_name ]; then
+        git clone \$path_bare_dir $deploy_name
+    else
+        git --work-tree=$deploy_name --git-dir=$current_work_dir/$repo_name checkout $branch_name -f
+    fi
+done
 cd $deploy_name
 echo -e "You must have a Makefile in your deployment repository!"
 make
 if [ \$? -ne 0 ]; then
-    echo "There are no Makefile"
+    echo "There is no Makefile"
 fi
 EOF
 chmod 775 'post-receive'

@@ -9,6 +9,9 @@
 int my_strlen(char *str)
 {
     char *s;
+
+    if (str == NULL)
+        return -1;
     for (s = str; *s != 0; s++);
     return s - str;
 }

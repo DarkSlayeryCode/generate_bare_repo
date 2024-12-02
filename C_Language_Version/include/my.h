@@ -34,8 +34,8 @@ typedef struct {
 
 extern download_with_t dspt[];
 
-
-extern sfm_t sfm; /* Software Package Manager (The command to download things ex: dnf, apt ...etc) */
+extern sfm_t sfm; /* Software Package Manager\
+ (The command to download things ex: dnf, apt ...etc) */
 extern char **environ;
 extern char pwd[2000];
 extern char response[5];
@@ -47,6 +47,7 @@ void usage(void);
 void get_pbip(void);
 char *my_whoami(void);
 char **bin_array(void);
+void repos_names(void);
 int my_strlen(char *str);
 char *cleanstr(char *src);
 void lower_str(char str[]);
@@ -59,5 +60,12 @@ int count_nb_chars(char *str, char *separator);
 char **str_to_array(char *str, char *separator);
 void execute_commands(char *command, char **arr);
 void get_users_request(char str[], char *display, bool low);
+// void fill_post_receive(void);
+// void set_deployment(void);
+// void check_dependencies(void);
+// void repos_names(void);
+// void create_deploy_and_hook(void);
+
+extern void (*cut_script[])(void);
 
 #endif /* MY_H_ */

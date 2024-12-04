@@ -46,12 +46,10 @@ void check_dependencies(void)
     if (get_command(bin_array(), "git") == NULL) {
         printf("git is not installed. Attempting to install git!!!\n");
         system(dspt[pos].make);
-        // execute_commands(sfm.exec_name, str_to_array(dspt[pos].git, " "));
     }
     if (get_command(bin_array(), "make") == NULL) {
         printf("make is not installed. Attempting to install make!!!\n");
         system(dspt[pos].make);
-        // execute_commands(sfm.exec_name, str_to_array(dspt[pos].make, " "));
     }
 }
 

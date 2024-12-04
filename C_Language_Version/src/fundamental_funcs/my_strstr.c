@@ -15,11 +15,14 @@ bool my_strstr(char *string, char *to_find)
         return false;
     if (strlen(to_find) > strlen(string))
         return false;
-    if (string[0] != to_find[0])
-        return false;
+    while (string[i] != 0 && string[i] != to_find[j])
+        i++;
     while (string[i] != 0 && string[i] == to_find[j]) {
         i++;
         j++;
     }
-    return (to_find[j] == 0) ? true : false;
+    if (to_find[j] == 0)
+        return true;
+    else
+        my_strstr(&string[i], to_find);
 }

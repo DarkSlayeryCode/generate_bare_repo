@@ -70,6 +70,7 @@ void set_deployment(void)
         reset_string(response);
         get_users_request(response, "The response can either be \"Yes\" or \"No\"\n", true);
     }
+    free(temp);
     return;
 }
 
@@ -84,12 +85,47 @@ void fill_post_receive(void)
     fprintf(post_receive, "\techo \"Master ref received.  Deploying %s branch to production...\"\n", branch_name);
     fprintf(post_receive, "\tif [ ! -d %s ]; then\n\t\tgit clone $path_bare_dir %s\n\telse\n", deploy_name, deploy_name);
     fprintf(post_receive, "\t\tgit --work-tree=%s --git-dir=%s/%s checkout %s -f\n", deploy_name, pwd, repo_name, branch_name);
-    fprintf(post_receive, "\tfi\ndone\ncd %s\n", deploy_name);
-    fprintf(post_receive, "echo -e \"You must have a Makefile in your deployment repository!\"\nmake\n");
+    fprintf(post_receive, "\tfi\ndone\ncd %s\n\n", deploy_name);
+    fprintf(post_receive, "make\n");
     fprintf(post_receive, "if [ $? -ne 0 ]; then\n\techo \"There is no Makefile\"\nfi\n");
     fclose(post_receive);
     chmod("post-receive", S_IRWXU | S_IRWXO | S_IRWXG);
     return;
+}
+
+static void cut_create_deploy(char git_bash_actions[3000])
+{
+    char re[200];
+
+    strcpy(git_bash_actions, "git clone ");
+    strcat(git_bash_actions, getcwd(re, 200));
+    strcat(git_bash_actions, " ");
+    strcat(git_bash_actions, deploy_name);
+    return;
+}
+
+static void temp_makefile(char *temp, char git_bash_actions[3000])
+{
+    char s[150];
+    int default_makefile = 0;
+
+    strcpy(git_bash_actions, pwd);
+    strcat(git_bash_actions, "/");
+    strcat(git_bash_actions, repo_name);
+    while (my_strstr(s, deploy_name) == false) {
+        chdir(deploy_name);
+        getcwd(s, 150);
+    }
+    default_makefile = open("Makefile", O_RDWR | O_CREAT, 0644);
+    dprintf(default_makefile, ".ONESHELL:\n");
+    dprintf(default_makefile, "all:\n\techo \"Hello World!\"\n");
+    close(default_makefile);
+    execute_commands(temp, str_to_array("git add Makefile", " "));
+    if (system("git add Makefile") == 0)
+        execute_commands(temp, str_to_array("git commit -m\"Temp_Makefile.\"", " "));
+    if (system("git commit -m \"Temp_Makefile.\"") == 0)
+        execute_commands(temp, str_to_array("git push", " "));
+    chdir(git_bash_actions);
 }
 
 void create_deploy_and_hook(void)
@@ -97,31 +133,29 @@ void create_deploy_and_hook(void)
     char *temp = get_command(bin_array(), "git");
     char git_bash_actions[3000];
 
-    if (response[0] == 'n') {
-        char re[200];
-        strcpy(git_bash_actions, "git clone ");
-        strcat(git_bash_actions, getcwd(re, 200));
-        strcat(git_bash_actions, " ");
-        strcat(git_bash_actions, deploy_name);
-        execute_commands(temp, str_to_array(git_bash_actions, " "));
-    } else {
+    cut_create_deploy(git_bash_actions);
+    execute_commands(temp, str_to_array(git_bash_actions, " "));
+    while (system(git_bash_actions) != 0);
+    if (response[0] == 'y') {
+        temp_makefile(temp, git_bash_actions);
+        sleep(1);
         get_users_request(branch_name, "On Which branch Would you like to set the hooks ?\n", false);
         if (my_strlen(branch_name) == 0)
             strcpy(branch_name, "master");
         chdir("hooks");
         cut_script[3]();
-        // fill_post_receive();
         printf("paste 'git clone %s@", my_whoami());
         get_pbip();
         printf(":%s/%s' in your terminal\n", pwd, repo_name);
     }
+    free(temp);
 }
 
 void (*cut_script[])(void) = {
-    repos_names,
-    check_dependencies,
-    set_deployment,
-    fill_post_receive,
-    create_deploy_and_hook,
+    repos_names, /**/
+    check_dependencies, /**/
+    set_deployment, /**/
+    fill_post_receive, /**/
+    create_deploy_and_hook, /**/
     NULL
 };

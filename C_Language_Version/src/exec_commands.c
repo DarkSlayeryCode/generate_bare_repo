@@ -45,12 +45,13 @@ void execute_commands(char *command, char **arr)
 
     if (fork_return == 0) {
         if (execve(command, arr, environ) == -1) {
-            printf("An error occurred, couldn't proceed with the generation.\n");
+            printf("An error occurred, ");
+            printf("couldn't proceed with the generation.\n");
             exit(-10);
         }
         exit(0);
     }
-    free(command);
+    // free(command);
     free_array(arr);
     if (fork_return == -10) {
         printf("Terminating...\n");

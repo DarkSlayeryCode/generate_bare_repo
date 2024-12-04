@@ -45,11 +45,13 @@ void check_dependencies(void)
 
     if (get_command(bin_array(), "git") == NULL) {
         printf("git is not installed. Attempting to install git!!!\n");
-        execute_commands(sfm.exec_name, str_to_array(dspt[pos].git, " "));
+        system(dspt[pos].make);
+        // execute_commands(sfm.exec_name, str_to_array(dspt[pos].git, " "));
     }
     if (get_command(bin_array(), "make") == NULL) {
         printf("make is not installed. Attempting to install make!!!\n");
-        execute_commands(sfm.exec_name, str_to_array(dspt[pos].make, " "));
+        system(dspt[pos].make);
+        // execute_commands(sfm.exec_name, str_to_array(dspt[pos].make, " "));
     }
 }
 
@@ -59,7 +61,7 @@ void set_deployment(void)
 
     chdir(repo_name);
     temp = get_command(bin_array(), "git");
-    execute_commands(temp, str_to_array("git init --bare", " "));
+    system("git init --bare");
     sleep(1);
     get_users_request(response, "Would you like to set CI/CD?\n(Yes/No)...\n", true);
     while (1) {
@@ -120,11 +122,9 @@ static void temp_makefile(char *temp, char git_bash_actions[3000])
     dprintf(default_makefile, ".ONESHELL:\n");
     dprintf(default_makefile, "all:\n\techo \"Hello World!\"\n");
     close(default_makefile);
-    execute_commands(temp, str_to_array("git add Makefile", " "));
-    if (system("git add Makefile") == 0)
-        execute_commands(temp, str_to_array("git commit -m\"Temp_Makefile.\"", " "));
-    if (system("git commit -m \"Temp_Makefile.\"") == 0)
-        execute_commands(temp, str_to_array("git push", " "));
+    system("git add Makefile");
+    system("git commit -m \"Temporary Makefile.\"");
+    system("git push");
     chdir(git_bash_actions);
 }
 
@@ -134,8 +134,7 @@ void create_deploy_and_hook(void)
     char git_bash_actions[3000];
 
     cut_create_deploy(git_bash_actions);
-    execute_commands(temp, str_to_array(git_bash_actions, " "));
-    while (system(git_bash_actions) != 0);
+    system(git_bash_actions);
     if (response[0] == 'y') {
         temp_makefile(temp, git_bash_actions);
         sleep(1);

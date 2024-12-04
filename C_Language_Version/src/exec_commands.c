@@ -51,7 +51,6 @@ void execute_commands(char *command, char **arr)
         }
         exit(0);
     }
-    // free(command);
     free_array(arr);
     if (fork_return == -10) {
         printf("Terminating...\n");

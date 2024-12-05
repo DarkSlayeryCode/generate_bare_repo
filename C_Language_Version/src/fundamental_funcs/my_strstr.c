@@ -13,7 +13,7 @@ bool my_strstr(char *string, char *to_find)
 
     if (to_find == NULL || string == NULL)
         return false;
-    if (strlen(to_find) > strlen(string))
+    if (my_strlen(to_find) > my_strlen(string))
         return false;
     while (string[i] != 0 && string[i] != to_find[j])
         i++;

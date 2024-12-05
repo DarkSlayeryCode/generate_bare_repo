@@ -21,6 +21,7 @@ static void get_sfm(void)
         s = get_command(bin_array(), known_distr[i]);
         if (s != NULL) {
             sfm = (sfm_t){known_distr[i], s};
+            free(s);
             return;
         }
     }

@@ -42,15 +42,19 @@ void repos_names(void)
 void check_dependencies(void)
 {
     int pos = dep_com_where();
+    char *s = get_command(bin_array(), "git");
 
-    if (get_command(bin_array(), "git") == NULL) {
+    if (s == NULL) {
         printf("git is not installed. Attempting to install git!!!\n");
         system(dspt[pos].make);
     }
-    if (get_command(bin_array(), "make") == NULL) {
+    free(s);
+    s = get_command(bin_array(), "make");
+    if (s == NULL) {
         printf("make is not installed. Attempting to install make!!!\n");
         system(dspt[pos].make);
     }
+    free(s);
 }
 
 void set_deployment(void)

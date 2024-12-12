@@ -39,6 +39,7 @@ extern char pwd[2000];
 extern char response[5];
 extern char *known_distr[];
 extern char repo_name[2000];
+extern bool is_already_filled;
 extern char branch_name[2000];
 extern char deploy_name[2500];
 extern download_with_t dspt[];

@@ -19,7 +19,8 @@ static int dep_com_where(void)
 
 void repos_names(void)
 {
-    get_users_request(repo_name, "Enter your project's repository name:\n", false);
+    if (is_already_filled == false)
+        get_users_request(repo_name, "Enter your project's repository name:\n", false);
     while (1) {
         if (my_strlen(repo_name) == 0) {
             reset_string(repo_name);

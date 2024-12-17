@@ -20,7 +20,7 @@ SRC	=	src/main.c	\
 
 OBJ	=	$(SRC:.c=.o)
 
-NAME	=	generate_bare_repo
+NAME	=	devops
 
 all:	$(NAME)
 

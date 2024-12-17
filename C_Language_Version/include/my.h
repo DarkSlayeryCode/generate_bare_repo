@@ -9,11 +9,13 @@
     #include <pwd.h>
     #include <fcntl.h>
     #include <stdio.h>
+    #include <dirent.h>
     #include <stdlib.h>
     #include <string.h>
     #include <unistd.h>
     #include <stdbool.h>
     #include <sys/stat.h>
+    #include <sys/types.h>
 
 typedef struct {
     int i;

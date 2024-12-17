@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/bash
 
 current_work_dir=$(pwd)
 
@@ -52,6 +52,19 @@ while :
 if [[ "$response" = "no" ]]; then
     git clone $(pwd) $deploy_name
 else
+
+    mkdir temp_dir && cd temp_dir && git init && git remote add origin $current_work_dir/$repo_name
+    cat << END > Makefile
+    .ONESHELL:
+    all:
+        \techo "Hello world"
+END
+    git add .
+    git commit -m"Temporary Makefile."
+    git push origin master
+cd .. && rm -fr temp_dir
+
+
     echo -e "On Which branch Would you like to set the hooks ?"
     read branch_name
 if [[ -z $branch_name ]]; then

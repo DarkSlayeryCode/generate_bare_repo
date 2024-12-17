@@ -5,6 +5,7 @@
         "scrollbar.shadow": "#00000000"
     },
     "files.associations": {
-        "my.h": "c"
+        "my.h": "c",
+        "string.h": "c"
     }
 }

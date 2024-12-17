@@ -65,7 +65,6 @@ void set_deployment(void)
     chdir(repo_name);
     temp = get_command(bin_array(), "git");
     system("git init --bare");
-    sleep(1);
     get_users_request(response, "Would you like to set CI/CD?\n(Yes/No)...\n", true);
     while (1) {
             if (my_strlen(response) == 1 && response[0] == 'y' || response[0] == 'n')

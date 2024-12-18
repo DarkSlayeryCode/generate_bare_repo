@@ -61,7 +61,7 @@ int main(int ac, char **av)
         printf("Name is not mandatory\n");
         exit(-42);
     }
-    if (ac == 4) {
+    if (ac == 3) {
         strcpy(repo_name, av[2]);
         is_already_filled = true;
     }
@@ -74,12 +74,13 @@ int main(int ac, char **av)
         cut_script[4]();
     } else {
         DIR *app_dir = NULL;
-        char domain_name[100];
+        char commands[500];
+        char root_docu[100];
+        int config_file = 0;
         char proxy_pass[100];
+        char domain_name[100];
         char server_alias[120];
         char config_file_name[110];
-        char commands[500];
-        int config_file = 0;
 
         if (geteuid() != 0) {
             printf("You need to run as root to use this option\n");
@@ -94,7 +95,7 @@ int main(int ac, char **av)
         strcat(config_file_name, ".conf");
         strcpy(server_alias, "www.");
         strcat(server_alias, domain_name);
-        get_users_request(response, "Would you like to set Reverse Proxy Deployment, yes or no?\n", true);
+        get_users_request(response, "Would you like to set Reverse Proxy Deployment? (y/n)\n", true);
         while (1) {
                 if (my_strlen(response) == 1 && response[0] == 'y' || response[0] == 'n')
                     break;
@@ -105,6 +106,8 @@ int main(int ac, char **av)
         }
         if (response[0] == 'y')
             get_users_request(proxy_pass, "Enter Proxy's domain:\n", false);
+        else
+            get_users_request(root_docu, "Enter Root document:\n", false);
         app_dir = opendir("/etc/apache2/");
         if (app_dir == NULL) {
             if (mkdir("/etc/apache2/", 0777) == -1) {
@@ -129,28 +132,41 @@ int main(int ac, char **av)
             exit(-42);
         }
         closedir(app_dir);
-        config_file = open(config_file_name, O_RDWR | O_CREAT, 0644);
-        system("pwd");
-        dprintf(config_file, "<VirtualHost *:80>\n\t\tServerName ");
-        // write(1, "lol\n", 4);
-        dprintf(config_file, "%s\n\t\tServerAlias %s\n", domain_name, server_alias);
-        dprintf(config_file, "\n\nserverAdmin webmaster@localhost\n");
-        if (response[0] == 'n')
-            dprintf(config_file, "\t\tDocumentRoot /var/www/html\n");
-        else {
+        config_file = open(config_file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+        if (config_file <= 0) {
+            close(config_file);
+            printf("Failed to create %s\n", config_file_name);
+            exit(-42);
+        }
+        dprintf(config_file, "<VirtualHost *:80>\n\tServerName ");
+        dprintf(config_file, "%s\n\tServerAlias %s\n", domain_name, server_alias);
+        dprintf(config_file, "\n\n\tserverAdmin webmaster@localhost\n");
+        if (response[0] == 'n') {
+            dprintf(config_file, "\tDocumentRoot %s\n", root_docu);
+            dprintf(config_file, "<Directory %s>\n", root_docu);
+            dprintf(config_file, "\tOptions Indexes FollowSymLinks MultiViews\n");
+            dprintf(config_file, "\tAllowOverride all\n\tRequire all granted\n\t");
+            dprintf(config_file, "Order allow,deny\n\tallow from all\n\n\t");
+            dprintf(config_file, "<IfModule mod_rewrite.c>\n\t\tRewriteEngine On\n");
+            dprintf(config_file, "\t\tRewriteBase /\n\t\tRewriteRule ^index\\.html$ - [L]\n");
+            dprintf(config_file, "\t\tRewriteCond %%{REQUEST_FILENAME} !-f\n");
+            dprintf(config_file, "\t\tRewriteCond %%{REQUEST_FILENAME} !-d\n");
+            dprintf(config_file, "\t\tRewriteRule . /index.html [L]\n");
+            dprintf(config_file, "\t</IfModule>\n</Directory>\n");
+        } else {
             dprintf(config_file, "\t\tProxyPass / %s\n", proxy_pass);
             dprintf(config_file, "\t\tProxyPassReverse / %s\n\n", proxy_pass);
         }
         dprintf(config_file, "\t\tErrorLog ${APACHE_LOG_DIR}/error.log\n");
-        dprintf(config_file, "\t\tCustomLog ${APACHE_LOG_DIR}/access.log combined\n\n");
-        dprintf(config_file, "RewriteEngine on\nRewriteCond %%{SERVER_NAME} =%s [OR]\n", server_alias);
-        dprintf(config_file, "RewriteCond %%{SERVER_NAME} =%s\n", domain_name);
-        dprintf(config_file, "RewriteRule ^ https://%%{SERVER_NAME}%%{REQUEST_URI} [END,NE,R=permanent]");
+        dprintf(config_file, "\t\tCustomLog ${APACHE_LOG_DIR}/access.log combined");
         dprintf(config_file, "\n</VirtualHost>\n");
         close(config_file);
         strcpy(commands, "sudo a2ensite ");
         strcat(commands, config_file_name);
         system(commands);
+        int s = dup(1);
+        int dev_null = open("/dev/null", O_WRONLY);
+        dup2(dev_null, 1);
         system("sudo -E a2enmod proxy");
         system("sudo -E a2enmod proxy_http");
         system("sudo -E a2enmod rewrite");
@@ -161,6 +177,9 @@ int main(int ac, char **av)
         strcat(commands, domain_name);
         strcat(commands, " --apache");
         system(commands);
+        close(dev_null);
+        // dup2(s, 1);
+        // close(s);
     }
     return 0;
 }

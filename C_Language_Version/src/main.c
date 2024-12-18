@@ -39,6 +39,28 @@ char *getpwd(void)
     return &environ[i][4];
 }
 
+void hide_norm_and_exec(char *str)
+{
+    int l = 0;
+    int dev_null = open("/dev/null", O_WRONLY);
+
+    if (dev_null == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        close(dev_null);
+        exit(EXIT_FAILURE);
+    }
+    if (pid == 0) {
+        dup2(dev_null, STDOUT_FILENO);
+        close(dev_null);
+        exit(system(str));
+    }
+}
+
 int main(int ac, char **av)
 {
     if (ac < 2 || ac > 3) {
@@ -167,9 +189,9 @@ int main(int ac, char **av)
         int s = dup(1);
         int dev_null = open("/dev/null", O_WRONLY);
         dup2(dev_null, 1);
-        system("sudo -E a2enmod proxy");
-        system("sudo -E a2enmod proxy_http");
-        system("sudo -E a2enmod rewrite");
+        system("sudo -E a2enmod proxy > /dev/null");
+        system("sudo -E a2enmod proxy_http > /dev/null");
+        system("sudo -E a2enmod rewrite > /dev/null");
         if (system("sudo -E systemctl restart apache2") != 0)
             system("sudo -E systemctl start apache2.service");
         system("sudo -E systemctl reload apache2");

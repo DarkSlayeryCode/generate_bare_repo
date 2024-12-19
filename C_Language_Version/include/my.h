@@ -54,6 +54,7 @@ char **bin_array(void);
 void repos_names(void);
 int my_strlen(char *str);
 char *cleanstr(char *src);
+void create_app(char **av);
 void lower_str(char str[]);
 void reset_string(char str[]);
 char **free_array(char **array);

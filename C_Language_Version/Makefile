@@ -8,6 +8,7 @@
 SRC	=	src/main.c	\
 		src/usage.c	\
 		src/whoami.c	\
+		src/create_app.c	\
 		src/cut_script.c	\
 		src/init_tables.c	\
 		src/exec_commands.c	\

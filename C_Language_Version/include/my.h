@@ -47,8 +47,8 @@ extern char deploy_name[2500];
 extern download_with_t dspt[];
 extern void (*cut_script[])(void);
 
-void usage(void);
 void get_pbip(void);
+void usage(char *s);
 char *my_whoami(void);
 char **bin_array(void);
 void repos_names(void);
